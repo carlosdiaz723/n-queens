@@ -32,7 +32,7 @@ for i in range(n):
 board[4][6] = 'queen'
 
 '''
-so we have a means of representing a chess board, 
+so we have a means of representing a chess board,
 lets make a more practical example using the concepts above
 '''
 
