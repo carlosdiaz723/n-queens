@@ -1,19 +1,8 @@
-from pprint import pprint as pretty
+import tkinter as tk
 
 
 # --------------------------------------------------
 # UTILITY
-
-def flip(board, row, col):
-    '''
-    A method for flipping the state of a tile
-    '''
-    # if the element is a boolean, just flip whatever it cuiently is
-    if type(board[row][col]) is bool:
-        board[row][col] = not board[row][col]
-    else:
-        board[row][col] = True
-
 
 def emptyBoard(size):
     board = list()
@@ -31,9 +20,9 @@ def printBoard(board):
                 print('#', end=' ')
         print()
 
+
 # --------------------------------------------------
 # BACKTRACKING
-
 
 def isSafeBT(board, row, col):
     for i in range(col):
@@ -48,7 +37,7 @@ def isSafeBT(board, row, col):
     return True
 
 
-def backtracking(board, col):
+def backtracking(board, col=0):
     if col >= n:
         return True
 
@@ -61,9 +50,9 @@ def backtracking(board, col):
                 board[i][col] = False
     return False
 
+
 # --------------------------------------------------
 # BRANCH AND BOUND
-
 
 def isSafeBB(row, col, leftDiag, rightDiag, rowLookup,
              leftDiagLookup, rightDiagLookup):
@@ -116,14 +105,82 @@ def branchAndBound(board):
     return branchAndBoundHelp(board, 0, leftDiag, rightDiag, rowLookup,
                               leftDiagLookup, rightDiagLookup)
 
+# --------------------------------------------------
+# RUNNERS
+
+
+def singleRun():
+    try:
+        n = int(singleN.get())
+    except ValueError:
+        print('N must be a valid integer')
+        return
+
+    isQueenBT = emptyBoard(size=n)
+    btSuccess = backtracking(isQueenBT)
+
+    isQueenBB = emptyBoard(size=n)
+    bbSuccess = branchAndBound(isQueenBB)
+
+
+def rangeRun():
+    try:
+        n = list(range(int(leftN.get()), int(rightN.get()) + 1))
+    except ValueError:
+        print('Both the lower and upper bounds of N must be valid integers')
+        return
+    print(n)
+
+
+def selectRun():
+    # try:
+    nList = str(selectN.get()).replace(' ', '').split(',')
+    nInts = list()
+    for i in nList:
+        nInts.append(int(i))
+    print(nInts)
+    # except:
+
 
 # --------------------------------------------------
+# GUI
+
+master = tk.Tk()
+master.title('N-Queens')
+master.option_add('*Font', 'Times 20')
+
+
+s = 'Solve an N-Queens Puzzle using N ='
+tk.Label(master, text=s).grid(row=0, column=0)
+singleN = tk.Entry(master)
+singleN.grid(row=0, column=1)
+tk.Button(master, text='Submit', command=singleRun).grid(row=0, column=2)
+
+
+tk.Label(master, text='or, using N from:').grid(row=1, column=0)
+leftN = tk.Entry(master)
+leftN.grid(row=1, column=1)
+tk.Label(master, text=' to:').grid(row=1, column=2)
+rightN = tk.Entry(master)
+rightN.grid(row=1, column=3)
+tk.Button(master, text='Submit', command=rangeRun).grid(row=1, column=4)
+
+s = 'or, select specific values for N. Separate them with commas:'
+tk.Label(master, text=s).grid(row=2, column=0)
+selectN = tk.Entry(master)
+selectN.grid(row=2, column=1)
+tk.Button(master, text='Submit', command=selectRun).grid(row=2, column=2)
+
+tk.mainloop()
+# --------------------------------------------------
 # MAIN
-n = 24
-'''isQueen = emptyBoard(size=n)
-if backtracking(isQueen, 0):
-    printBoard(isQueen)'''
+n = int()
+'''
+isQueen = emptyBoard(size=n)
+if backtracking(isQueen):
+    printBoard(isQueen)
 
 isQueen = emptyBoard(size=n)
 if branchAndBound(isQueen):
     printBoard(isQueen)
+'''
