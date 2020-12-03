@@ -1,8 +1,9 @@
 import tkinter as tk
-
+import time
 
 # --------------------------------------------------
 # UTILITY
+
 
 def emptyBoard(size):
     board = list()
@@ -110,17 +111,35 @@ def branchAndBound(board):
 
 
 def singleRun():
+    global n
     try:
         n = int(singleN.get())
+        assert n >= 8
     except ValueError:
         print('N must be a valid integer')
         return
+    except AssertionError:
+        print('N must be GREATER THAN or EQUAL TO *8*')
+        return
 
     isQueenBT = emptyBoard(size=n)
+    t1 = time.time_ns()
     btSuccess = backtracking(isQueenBT)
+    t2 = time.time_ns()
+    btDelta = t2 - t1
 
     isQueenBB = emptyBoard(size=n)
+    t1 = time.time_ns()
     bbSuccess = branchAndBound(isQueenBB)
+    t2 = time.time_ns()
+    bbDelta = t2 - t1
+
+    print('\n\nFor N={}, \nBacktracking Solution (found '
+          'in ~{} microseconds): '.format(n, round(btDelta/1000)))
+    printBoard(isQueenBT)
+    print('\nBranch and Bound Solution (found in ~{} micro'
+          'seconds): '.format(round(bbDelta/1000)))
+    printBoard(isQueenBB)
 
 
 def rangeRun():
@@ -150,7 +169,7 @@ master.title('N-Queens')
 master.option_add('*Font', 'Times 20')
 
 
-s = 'Solve an N-Queens Puzzle using N ='
+s = 'Solve an N-Queens Puzzle (N > 7) using N ='
 tk.Label(master, text=s).grid(row=0, column=0)
 singleN = tk.Entry(master)
 singleN.grid(row=0, column=1)
