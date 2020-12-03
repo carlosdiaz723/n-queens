@@ -1,6 +1,6 @@
 from pprint import pprint as pretty
 
-n = 20
+n = 24
 isQueen = list()
 
 for i in range(n):
@@ -22,9 +22,9 @@ def printBoard(board):
     for i in range(n):
         for j in range(n):
             if board[i][j]:
-                print('Q', end='\t')
+                print('Q', end=' ')
             else:
-                print('#', end='\t')
+                print('#', end=' ')
         print()
 
 
