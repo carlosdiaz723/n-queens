@@ -90,10 +90,8 @@ def branchAndBoundHelp(board, col, leftDiag, rightDiag,
 
 
 def branchAndBound(board):
-
     leftDiag = [[0 for i in range(n)] for j in range(n)]
     rightDiag = [[0 for i in range(n)] for j in range(n)]
-
     rowLookup = [False] * n
     leftDiagLookup = [False] * (2 * n - 1)
     rightDiagLookup = [False] * (2 * n - 1)
@@ -101,7 +99,7 @@ def branchAndBound(board):
     for i in range(n):
         for j in range(n):
             leftDiag[i][j] = i + j
-            rightDiag[i][j] = i - j + 7
+            rightDiag[i][j] = i - j + (n - 1)
 
     return branchAndBoundHelp(board, 0, leftDiag, rightDiag, rowLookup,
                               leftDiagLookup, rightDiagLookup)
@@ -125,12 +123,13 @@ def singleRun():
     isQueenBT = emptyBoard(size=n)
     t1 = time.time_ns()
     btSuccess = backtracking(isQueenBT)
+    assert btSuccess, 'Backtracking failed to find a solution'
     t2 = time.time_ns()
     btDelta = t2 - t1
-
     isQueenBB = emptyBoard(size=n)
     t1 = time.time_ns()
     bbSuccess = branchAndBound(isQueenBB)
+    assert bbSuccess, 'Branch and Bound failed to find a solution'
     t2 = time.time_ns()
     bbDelta = t2 - t1
 
@@ -144,21 +143,67 @@ def singleRun():
 
 def rangeRun():
     try:
-        n = list(range(int(leftN.get()), int(rightN.get()) + 1))
+        nList = list(range(int(leftN.get()), int(rightN.get()) + 1))
+        assert int(rightN.get()) > int(leftN.get()) >= 8
     except ValueError:
-        print('Both the lower and upper bounds of N must be valid integers')
+        print('Invalid Range. Both the lower and upper bounds of N must be '
+              'valid integers')
         return
-    print(n)
+    except AssertionError:
+        print('Invalid Range. Lower bound must be >= 8, and upper bounds must '
+              'be greater than the lower bound')
+        return
+    selectRun(nList)
 
 
-def selectRun():
-    # try:
-    nList = str(selectN.get()).replace(' ', '').split(',')
+def selectRun(range=None):
+    global n
     nInts = list()
-    for i in nList:
-        nInts.append(int(i))
-    print(nInts)
-    # except:
+    if range is not None:
+        nInts = range
+    else:
+        try:
+            nList = str(selectN.get()).replace(' ', '').split(',')
+            nInts = list()
+            for i in nList:
+                assert int(i) >= 8
+                nInts.append(int(i))
+        except ValueError:
+            print('Invalid sequence. Ensure only one comma between entries and'
+                  ' that all entries are integers')
+            return
+        except AssertionError:
+            print('Invalid sequence. All values for N must be GREATER THAN '
+                  'or EQUAL TO *8*')
+            return
+
+    bbTimes, btTimes = list(), list()
+
+    for i in nInts:
+        n = i
+        isQueenBT = emptyBoard(size=n)
+        t1 = time.time_ns()
+        btSuccess = backtracking(isQueenBT)
+        assert btSuccess, 'Backtracking failed to find a solution '\
+                          'for n={}'.format(n)
+        t2 = time.time_ns()
+        btDelta = t2 - t1
+        btTimes.append(btDelta)
+        isQueenBB = emptyBoard(size=n)
+        t1 = time.time_ns()
+        bbSuccess = branchAndBound(isQueenBB)
+        assert bbSuccess, 'Branch and Bound failed to find a solution '\
+                          'for n={}'.format(n)
+        t2 = time.time_ns()
+        bbDelta = t2 - t1
+        bbTimes.append(bbDelta)
+
+        print('\n\nFor N={}, \nBacktracking Solution (found '
+              'in ~{} microseconds): '.format(n, round(btDelta/1000)))
+        printBoard(isQueenBT)
+        print('\nBranch and Bound Solution (found in ~{} micro'
+              'seconds): '.format(round(bbDelta/1000)))
+        printBoard(isQueenBB)
 
 
 # --------------------------------------------------
@@ -169,7 +214,7 @@ master.title('N-Queens')
 master.option_add('*Font', 'Times 20')
 
 
-s = 'Solve an N-Queens Puzzle (N > 7) using N ='
+s = 'Solve an N-Queens Puzzle (N >= 8) using N ='
 tk.Label(master, text=s).grid(row=0, column=0)
 singleN = tk.Entry(master)
 singleN.grid(row=0, column=1)
