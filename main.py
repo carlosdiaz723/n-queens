@@ -1,5 +1,6 @@
 import tkinter as tk
 import time
+import matplotlib.pyplot as plt
 
 # --------------------------------------------------
 # UTILITY
@@ -121,23 +122,23 @@ def singleRun():
         return
 
     isQueenBT = emptyBoard(size=n)
-    t1 = time.time_ns()
+    t1 = time.perf_counter_ns()
     btSuccess = backtracking(isQueenBT)
     assert btSuccess, 'Backtracking failed to find a solution'
-    t2 = time.time_ns()
+    t2 = time.perf_counter_ns()
     btDelta = t2 - t1
     isQueenBB = emptyBoard(size=n)
-    t1 = time.time_ns()
+    t1 = time.perf_counter_ns()
     bbSuccess = branchAndBound(isQueenBB)
     assert bbSuccess, 'Branch and Bound failed to find a solution'
-    t2 = time.time_ns()
+    t2 = time.perf_counter_ns()
     bbDelta = t2 - t1
 
     print('\n\nFor N={}, \nBacktracking Solution (found '
-          'in ~{} microseconds): '.format(n, round(btDelta/1000)))
+          'in {:,} nanoseconds): '.format(n, btDelta))
     printBoard(isQueenBT)
-    print('\nBranch and Bound Solution (found in ~{} micro'
-          'seconds): '.format(round(bbDelta/1000)))
+    print('\nBranch and Bound Solution (found in {:,} nano'
+          'seconds): '.format(bbDelta))
     printBoard(isQueenBB)
 
 
@@ -182,32 +183,48 @@ def selectRun(range=None):
     for i in nInts:
         n = i
         isQueenBT = emptyBoard(size=n)
-        t1 = time.time_ns()
+        t1 = time.perf_counter_ns()
         btSuccess = backtracking(isQueenBT)
         assert btSuccess, 'Backtracking failed to find a solution '\
                           'for n={}'.format(n)
-        t2 = time.time_ns()
+        t2 = time.perf_counter_ns()
         btDelta = t2 - t1
         btTimes.append(btDelta)
         isQueenBB = emptyBoard(size=n)
-        t1 = time.time_ns()
+        t1 = time.perf_counter_ns()
         bbSuccess = branchAndBound(isQueenBB)
         assert bbSuccess, 'Branch and Bound failed to find a solution '\
                           'for n={}'.format(n)
-        t2 = time.time_ns()
+        t2 = time.perf_counter_ns()
         bbDelta = t2 - t1
         bbTimes.append(bbDelta)
 
         print('\n\nFor N={}, \nBacktracking Solution (found '
-              'in ~{} microseconds): '.format(n, round(btDelta/1000)))
+              'in {:,} nanoseconds): '.format(n, btDelta))
         printBoard(isQueenBT)
-        print('\nBranch and Bound Solution (found in ~{} micro'
-              'seconds): '.format(round(bbDelta/1000)))
+        print('\nBranch and Bound Solution (found in {:,} nano'
+              'seconds): '.format(bbDelta))
         printBoard(isQueenBB)
 
+    showGraphs(nInts, btTimes, bbTimes)
+# --------------------------------------------------
+# OUTPUT GRAPHS
+
+
+def showGraphs(x, y1, y2):
+    _, ax = plt.subplots()
+    # x = np.array(x, dtype=int)
+    ax.plot(x, y1, label='BackTracking')
+    ax.plot(x, y2, label='Branch and Bound')
+    ax.set(xlabel='N',
+           ylabel='Time Taken (nanoseconds)',
+           title='Time Taken as N Increases')
+    plt.legend(loc='upper left')
+    plt.show()
 
 # --------------------------------------------------
 # GUI
+
 
 master = tk.Tk()
 master.title('N-Queens')
