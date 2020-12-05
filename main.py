@@ -132,7 +132,7 @@ def bbRecursive(board, col, leftDiag, rightDiag,
 
 def branchAndBound(board):
     '''
-    The setup for the Branch and Bound algortihm right before the recursive
+    The setup for the Branch and Bound algorithm right before the recursive
     function is called. Here, the lookup tables are created and instantiated
     properly based off of N. This preprocessing is part of the reason why BB is
     much faster as N increases.
@@ -207,7 +207,7 @@ def rangeRun():
     '''
     Runs when a range of N is selected on the GUI.
     This is an indirect call to selectRun() since logically a range is just a
-    special case of a select run. 
+    special case of a select run.
     '''
     # ensure that the lower and upper bounds are valid
     try:
@@ -301,7 +301,7 @@ def selectRun(range=None):
 
 def showGraphs(x, y1, y2):
     '''
-    Creates and shows a graph of the Times Taken for each N by both algorithms 
+    Creates and shows a graph of the Times Taken for each N by both algorithms
     '''
     # instantiate plot
     _, ax = plt.subplots()
